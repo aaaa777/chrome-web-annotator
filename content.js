@@ -174,10 +174,15 @@
 
     div.querySelector('.wa-btn-close').addEventListener('click', removeTooltip);
 
+    // Prevent mousedown inside tooltip from clearing the text selection
+    div.addEventListener('mousedown', (e) => {
+      if (!e.target.matches('.wa-input')) {
+        e.preventDefault();
+      }
+    });
+
     document.body.appendChild(div);
     tooltip = div;
-
-    requestAnimationFrame(() => textarea.focus());
   }
 
   // --- Util ---
