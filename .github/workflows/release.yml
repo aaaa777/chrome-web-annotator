@@ -21,6 +21,7 @@ jobs:
             -x ".git/*" \
             -x ".github/*" \
             -x "scripts/*" \
+            -x "screenshots/*" \
             -x "README.md" \
             -x "PRIVACY.md" \
             -x "LICENSE"
