@@ -15,21 +15,25 @@
 
   async function loadAnnotations() {
     return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEY], (result) => {
-        const all = result[STORAGE_KEY] || {};
-        annotations = all[getPageKey()] || [];
-        resolve(annotations);
-      });
+      try {
+        chrome.storage.local.get([STORAGE_KEY], (result) => {
+          const all = result[STORAGE_KEY] || {};
+          annotations = all[getPageKey()] || [];
+          resolve(annotations);
+        });
+      } catch { resolve([]); }
     });
   }
 
   async function saveAnnotations() {
     return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEY], (result) => {
-        const all = result[STORAGE_KEY] || {};
-        all[getPageKey()] = annotations;
-        chrome.storage.local.set({ [STORAGE_KEY]: all }, resolve);
-      });
+      try {
+        chrome.storage.local.get([STORAGE_KEY], (result) => {
+          const all = result[STORAGE_KEY] || {};
+          all[getPageKey()] = annotations;
+          chrome.storage.local.set({ [STORAGE_KEY]: all }, resolve);
+        });
+      } catch { resolve(); }
     });
   }
 
