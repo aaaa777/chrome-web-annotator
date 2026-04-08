@@ -3,7 +3,7 @@
   "name": "Web Annotator",
   "short_name": "Annotator",
   "version": "0.1.0",
-  "description": "Webページにコメントを追加し、Markdown形式でAIチャットに連携する拡張機能",
+  "description": "Webページのテキストにコメントを追加し、Markdown形式でエクスポートできる拡張機能",
   "homepage_url": "https://github.com/aaaa777/chrome-web-annotator",
   "permissions": [
     "storage",
