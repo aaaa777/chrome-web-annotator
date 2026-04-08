@@ -51,8 +51,7 @@ def gen_icon(size, path):
     S = size
 
     # --- Background: rounded square with grey border (anti-aliased) ---
-    # At 16px, use no margin to avoid cramped appearance
-    margin = 0 if S <= 16 else S * 0.06
+    margin = S * 0.06
     bg_corner_r = S * 0.20
     border_w = max(1, S * 0.04)
     bg_x0, bg_y0 = margin, margin
@@ -67,8 +66,7 @@ def gen_icon(size, path):
     # --- Bubble parameters (normalized coordinates, from original approved design) ---
     center = S / 2.0
     bubble_scale = S * 0.34  # coordinate space scale
-    # At 16px, reduce vertical offset to center the bubble body (no tail)
-    bubble_y_offset = 0.10 if S <= 16 else 0.18
+    bubble_y_offset = 0.18
 
     for y in range(S):
         for x in range(S):
@@ -109,12 +107,10 @@ def gen_icon(size, path):
                     if math.sqrt(ddx*ddx + ddy*ddy) > cr:
                         in_bubble = False
 
-                # Tail (triangle going down-right from bubble, skip at 16px)
-                in_tail = False
-                if S > 16:
-                    in_tail = (bx > 0.1 and bx < 0.5 and
-                              by > bubble_h + 0.05 and by < bubble_h + 0.45 and
-                              bx - 0.1 > (by - bubble_h - 0.05) * 0.3)
+                # Tail (triangle going down-right from bubble)
+                in_tail = (bx > 0.1 and bx < 0.5 and
+                          by > bubble_h + 0.05 and by < bubble_h + 0.45 and
+                          bx - 0.1 > (by - bubble_h - 0.05) * 0.3)
 
                 # White text lines inside bubble
                 in_line1 = abs(bx) < 0.5 and abs(by + 0.15) < 0.06 and in_bubble
@@ -131,10 +127,59 @@ def gen_icon(size, path):
     with open(path, 'wb') as f:
         f.write(data)
     print(f'Created {path} ({S}x{S}, {len(data)} bytes)')
+    return pixels
+
+
+def downscale(src_pixels, src_size, dst_size):
+    """Downscale RGBA pixels using proper area averaging (handles non-integer ratios)."""
+    ratio = src_size / dst_size
+    dst_pixels = [0] * (dst_size * dst_size * 4)
+    for dy in range(dst_size):
+        for dx in range(dst_size):
+            # Source area covered by this destination pixel
+            sx0 = dx * ratio
+            sy0 = dy * ratio
+            sx1 = (dx + 1) * ratio
+            sy1 = (dy + 1) * ratio
+            tr, tg, tb, ta = 0.0, 0.0, 0.0, 0.0
+            total_weight = 0.0
+            for sy in range(int(sy0), min(int(sy1) + 1, src_size)):
+                for sx in range(int(sx0), min(int(sx1) + 1, src_size)):
+                    # Weight = overlap area between source pixel and target area
+                    ox0 = max(sx, sx0)
+                    oy0 = max(sy, sy0)
+                    ox1 = min(sx + 1, sx1)
+                    oy1 = min(sy + 1, sy1)
+                    if ox1 > ox0 and oy1 > oy0:
+                        w = (ox1 - ox0) * (oy1 - oy0)
+                        si = (sy * src_size + sx) * 4
+                        tr += src_pixels[si] * w
+                        tg += src_pixels[si + 1] * w
+                        tb += src_pixels[si + 2] * w
+                        ta += src_pixels[si + 3] * w
+                        total_weight += w
+            di = (dy * dst_size + dx) * 4
+            if total_weight > 0:
+                dst_pixels[di] = int(tr / total_weight + 0.5)
+                dst_pixels[di + 1] = int(tg / total_weight + 0.5)
+                dst_pixels[di + 2] = int(tb / total_weight + 0.5)
+                dst_pixels[di + 3] = int(ta / total_weight + 0.5)
+    data = create_png(dst_size, dst_size, dst_pixels)
+    return data
 
 
 if __name__ == '__main__':
     base = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'icons')
     os.makedirs(base, exist_ok=True)
-    for s in [16, 48, 128]:
-        gen_icon(s, os.path.join(base, f'icon{s}.png'))
+
+    # Render at 128px (native), then downscale for 48px and 16px
+    SRC = 128
+    src_path = os.path.join(base, f'icon{SRC}.png')
+    src_pixels = gen_icon(SRC, src_path)
+
+    for dst in [48, 16]:
+        data = downscale(src_pixels, SRC, dst)
+        dst_path = os.path.join(base, f'icon{dst}.png')
+        with open(dst_path, 'wb') as f:
+            f.write(data)
+        print(f'Created {dst_path} ({dst}x{dst}, {len(data)} bytes) [downscaled from {SRC}px]')
