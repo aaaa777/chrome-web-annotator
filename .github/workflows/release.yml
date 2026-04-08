@@ -17,6 +17,7 @@ jobs:
       - name: Create ZIP
         run: |
           zip -r web-annotator.zip . \
+            -x ".git" \
             -x ".git/*" \
             -x ".github/*" \
             -x "scripts/*" \
