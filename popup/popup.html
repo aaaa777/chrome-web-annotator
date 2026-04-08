@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Annotator</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <h1 class="popup-title">Web Annotator</h1>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="current">このページ</button>
+      <button class="tab-btn" data-tab="all">全ページ</button>
+    </div>
+    <div id="page-info" class="page-info"></div>
+    <div id="annotations-list" class="annotations-list">
+      <p class="empty-message">読み込み中...</p>
+    </div>
+    <div class="action-row">
+      <button id="copy-btn" class="btn btn-primary" disabled>このページをコピー</button>
+      <button id="clear-btn" class="btn btn-danger" disabled>このページを削除</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
