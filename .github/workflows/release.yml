@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create ZIP
+        run: |
+          zip -r web-annotator.zip . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "README.md" \
+            -x "PRIVACY.md" \
+            -x "LICENSE"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: web-annotator.zip
+          generate_release_notes: true
