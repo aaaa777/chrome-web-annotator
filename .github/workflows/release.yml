@@ -19,6 +19,7 @@ jobs:
           zip -r web-annotator.zip . \
             -x ".git/*" \
             -x ".github/*" \
+            -x "scripts/*" \
             -x "README.md" \
             -x "PRIVACY.md" \
             -x "LICENSE"
