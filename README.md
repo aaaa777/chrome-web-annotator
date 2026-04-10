@@ -33,9 +33,9 @@ Webページにコメントを追加し、Markdown形式でエクスポートす
 
 ## インストール
 
-### Chrome Web Store（審査中）
+### Chrome Web Store
 
-> 審査完了後にリンクを追加予定
+[Chrome Web Store | Web Annotator](https://chromewebstore.google.com/detail/web-annotator/ligecchlpnpggicclbideekonlmbalco?hl=ja&authuser=0)
 
 ### 手動インストール
 
